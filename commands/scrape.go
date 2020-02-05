@@ -1,16 +1,9 @@
 package commands
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
+	"github.com/vitorfhc/goforces/scrapers"
 )
-
-type target struct {
-	contest   string
-	problem   string
-	isContest bool
-}
 
 var scrapeCmd = &cobra.Command{
 	Use:   "scrape [contest] [problem]",
@@ -24,38 +17,15 @@ Problem: saves every inputs, outputs, and the problem's text`,
 }
 
 func execute(cmd *cobra.Command, args []string) {
-	t := target{"", "", false}
-	t.contest = args[0]
+	t := scrapers.Target{"", "", false}
+	t.Contest = args[0]
 
 	if len(args) == 1 {
-		t.isContest = true
-		scrape(t)
+		t.IsContest = true
+		scrapers.Scrape(t)
 		return
 	}
 
-	t.problem = args[1]
-	scrape(t)
-}
-
-func scrape(t target) {
-	if t.isContest {
-		log.Println("Scrapping contest", t.contest)
-		problems := scrapeContest(t)
-
-		for _, pt := range problems {
-			scrapeProblem(pt)
-		}
-
-		return
-	}
-
-	scrapeProblem(t)
-}
-
-func scrapeContest(t target) []target {
-	return nil
-}
-
-func scrapeProblem(t target) {
-	log.Println("Scrapping problem", t.problem, "from contest", t.contest)
+	t.Problem = args[1]
+	scrapers.Scrape(t)
 }
