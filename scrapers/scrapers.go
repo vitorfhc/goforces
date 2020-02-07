@@ -3,6 +3,7 @@ package scrapers
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
@@ -10,6 +11,7 @@ import (
 var (
 	collector *colly.Collector
 	contest   string
+	workdir   string
 )
 
 const (
@@ -22,9 +24,18 @@ func init() {
 		colly.AllowedDomains("www.codeforces.com", "codeforces.com"),
 	)
 
-	collector.OnHTML("table.problems tbody", ScrapeContest)
+	collector.OnHTML("table.problems tbody", scrapeContest)
+	collector.OnHTML("div.problem-statement", scrapeProblem)
+
+	var err error
+	workdir, err = os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	workdir = workdir + "/"
 }
 
+// Scrape given contest where contest number is the number in the url
 func Scrape(contestNumber string) {
 	contest = contestNumber
 	contestURL := urlPrefix + contestPath + contest
@@ -34,8 +45,9 @@ func Scrape(contestNumber string) {
 	}
 }
 
-func ScrapeContest(el *colly.HTMLElement) {
-	err := os.MkdirAll(contest, 0644)
+func scrapeContest(el *colly.HTMLElement) {
+	path := workdir + contest
+	err := os.Mkdir(path, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,4 +57,14 @@ func ScrapeContest(el *colly.HTMLElement) {
 	})
 }
 
-func ScrapeProblem() {}
+func scrapeProblem(el *colly.HTMLElement) {
+	problemTitle := el.ChildText("div.title")
+	problemShortName := problemTitle[:strings.IndexByte(problemTitle, '.')]
+	problemFolder := workdir + contest + "/" + problemShortName
+	err := os.Mkdir(problemFolder, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// scrape the rest and save
+}
