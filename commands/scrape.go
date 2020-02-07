@@ -6,26 +6,14 @@ import (
 )
 
 var scrapeCmd = &cobra.Command{
-	Use:   "scrape [contest] [problem]",
+	Use:   "scrape [contest]",
 	Short: "Scrapes a contest or a problem",
-	Long: `Scrapes all the problems from a contest if no problem is given
-or just the specific problem.
-Contest: saves each problem in a specific folder
-Problem: saves every inputs, outputs, and the problem's text`,
-	Args: cobra.RangeArgs(1, 2),
-	Run:  execute,
+	Long: `Scrapes all the problems from a contest and saves them
+in folders with its inputs and outputs.`,
+	Args: cobra.ExactArgs(1),
+	Run:  executeScraper,
 }
 
-func execute(cmd *cobra.Command, args []string) {
-	t := scrapers.Target{"", "", false}
-	t.Contest = args[0]
-
-	if len(args) == 1 {
-		t.IsContest = true
-		scrapers.Scrape(t)
-		return
-	}
-
-	t.Problem = args[1]
-	scrapers.Scrape(t)
+func executeScraper(cmd *cobra.Command, args []string) {
+	scrapers.Scrape(args[0])
 }
