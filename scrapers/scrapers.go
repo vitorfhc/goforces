@@ -3,16 +3,16 @@ package scrapers
 import (
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly"
+	"github.com/vitorfhc/goforces/fs"
 )
 
 var (
 	collector *colly.Collector
-	contest   string
-	workdir   string
+	contest   string // contest number present in the url for the contest
+	workdir   string // working directory to save everything
 )
 
 const (
@@ -21,6 +21,7 @@ const (
 )
 
 func init() {
+	// setup the collector
 	collector = colly.NewCollector(
 		colly.AllowedDomains("www.codeforces.com", "codeforces.com"),
 	)
@@ -28,6 +29,7 @@ func init() {
 	collector.OnHTML("table.problems tbody", scrapeContest)
 	collector.OnHTML("div.problem-statement", scrapeProblem)
 
+	// setup the working directory
 	var err error
 	workdir, err = os.Getwd()
 	if err != nil {
@@ -62,6 +64,7 @@ func scrapeProblem(el *colly.HTMLElement) {
 	problemTitle := el.ChildText("div.title")
 	problemShortName := problemTitle[:strings.IndexByte(problemTitle, '.')]
 	problemFolder := workdir + contest + "/" + problemShortName + "/"
+
 	err := os.Mkdir(problemFolder, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
@@ -72,37 +75,13 @@ func scrapeProblem(el *colly.HTMLElement) {
 		e.ForEach("pre", func(ind int, pre *colly.HTMLElement) {
 			isInput := ind%2 == 0
 
-			filename := buildProblemFilename(testNumber, isInput)
+			filename := fs.BuildProblemFilename(testNumber, isInput)
 			path := problemFolder + filename
-			writeTestFile(path, pre.Text)
+			fs.WriteTestFile(path, pre.Text)
 
 			if !isInput {
 				testNumber++
 			}
 		})
 	})
-}
-
-func buildProblemFilename(ind int, isInput bool) string {
-	var filename string
-
-	if isInput {
-		filename = "input-" + strconv.Itoa(ind) + ".txt"
-	} else {
-		filename = "output-" + strconv.Itoa(ind) + ".txt"
-	}
-
-	return filename
-}
-
-func writeTestFile(path string, text string) {
-	f, err := os.Create(path)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer f.Close()
-
-	f.WriteString(text)
 }
