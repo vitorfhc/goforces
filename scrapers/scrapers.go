@@ -3,6 +3,7 @@ package scrapers
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -60,11 +61,48 @@ func scrapeContest(el *colly.HTMLElement) {
 func scrapeProblem(el *colly.HTMLElement) {
 	problemTitle := el.ChildText("div.title")
 	problemShortName := problemTitle[:strings.IndexByte(problemTitle, '.')]
-	problemFolder := workdir + contest + "/" + problemShortName
+	problemFolder := workdir + contest + "/" + problemShortName + "/"
 	err := os.Mkdir(problemFolder, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// scrape the rest and save
+	el.ForEach("div.sample-test", func(_ int, e *colly.HTMLElement) {
+		testNumber := 1
+		e.ForEach("pre", func(ind int, pre *colly.HTMLElement) {
+			isInput := ind%2 == 0
+
+			filename := buildProblemFilename(testNumber, isInput)
+			path := problemFolder + filename
+			writeTestFile(path, pre.Text)
+
+			if !isInput {
+				testNumber++
+			}
+		})
+	})
+}
+
+func buildProblemFilename(ind int, isInput bool) string {
+	var filename string
+
+	if isInput {
+		filename = "input-" + strconv.Itoa(ind) + ".txt"
+	} else {
+		filename = "output-" + strconv.Itoa(ind) + ".txt"
+	}
+
+	return filename
+}
+
+func writeTestFile(path string, text string) {
+	f, err := os.Create(path)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	f.WriteString(text)
 }
