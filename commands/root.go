@@ -19,6 +19,7 @@ func init() {
 	rootCmd.AddCommand(testCmd)
 }
 
+// Execute initializes the root Cobra command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
