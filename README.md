@@ -1,6 +1,6 @@
 # GoForces
 
-GoForces is a tool to easily set all you need to start a contest from CodeForces as fast as possible.
+GoForces is a tool to easily set all you need to start a contest from CodeForces as fast as possible. For now it also makes some basic comparison for testing your code.
 
 ## Get GoForces
 
@@ -22,9 +22,12 @@ Usage:
 Available Commands:
   help        Help about any command
   scrape      Scrapes a contest or a problem
+  test        Takes an executable and tests it with the input files
 
 Flags:
   -h, --help   help for goforces
+
+Use "goforces [command] --help" for more information about a command.
 ```
 
 ## Example
