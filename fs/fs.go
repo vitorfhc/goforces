@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -22,7 +23,19 @@ func BuildProblemFilename(ind int, isInput bool) string {
 	return filename
 }
 
-// WriteFile writes the text to the given file (path)
+// ReadFile reads a file from a given path and returns its content
+func ReadFile(path string) string {
+	data, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	text := string(data)
+	return text
+}
+
+// WriteFile writes the text to the given path
 func WriteFile(path string, text string) {
 	f, err := os.Create(path)
 

@@ -12,7 +12,7 @@ var testCmd = &cobra.Command{
 with all input files comparing then with the output files.
 Tip: you can run python files using the shebang #!/bin/python`,
 	Args: cobra.ExactArgs(1),
-	Run:  executeScraper,
+	Run:  executeTest,
 }
 
 func executeTest(cmd *cobra.Command, args []string) {
