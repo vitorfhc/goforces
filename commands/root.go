@@ -16,6 +16,7 @@ scrapes the problems inputs and outputs fastly.`,
 
 func init() {
 	rootCmd.AddCommand(scrapeCmd)
+	rootCmd.AddCommand(testCmd)
 }
 
 func Execute() {
