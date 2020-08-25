@@ -77,7 +77,7 @@ func scrapeProblem(el *colly.HTMLElement) {
 
 			filename := fs.BuildProblemFilename(testNumber, isInput)
 			path := problemFolder + filename
-			fs.WriteTestFile(path, pre.Text)
+			fs.WriteFile(path, pre.Text)
 
 			if !isInput {
 				testNumber++
