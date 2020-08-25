@@ -16,8 +16,10 @@ scrapes the problems inputs and outputs fastly.`,
 
 func init() {
 	rootCmd.AddCommand(scrapeCmd)
+	rootCmd.AddCommand(testCmd)
 }
 
+// Execute initializes the root Cobra command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
